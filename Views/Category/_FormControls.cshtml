@@ -1,0 +1,20 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@using Marketplace.Models
+@model Category
+@{
+}
+
+<div class="mb-3">
+	@Html.LabelFor(m => m.Title, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Title, new {@class = "form-control", placeholder = "Input title..."})
+	@Html.ValidationMessageFor(m => m.Title)
+</div>
+<div class="mb-3">
+	@Html.LabelFor(m => m.Image, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Image, new {@class = "form-control", type="file", accept=".jpg,.png,.jpeg"})
+	@Html.ValidationMessageFor(m => m.Image)
+</div>
+<button type="submit" class="btn btn-success">Save</button>
+<a href="/Category/Index" class="btn btn-outline-info">Return</a>

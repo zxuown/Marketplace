@@ -1,0 +1,128 @@
+﻿@using Marketplace.Models;
+@using SKit.NovaPoshta.Client.Responses;
+@using SKit.NovaPoshta.Domain.Address;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var item = ViewData["itemSold"] as Item;
+}
+@model Order
+
+
+
+<div class="mb-3 OrderName">
+    @Html.LabelFor(m => m.Name, new { @class = "form-label" })
+    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Input Name...", required = "required" })
+    @Html.ValidationMessageFor(m => m.Name)
+</div>
+
+<div class="mb-3 OrderSecondName">
+    @Html.LabelFor(m => m.SecondName, new { @class = "form-label" })
+    @Html.TextBoxFor(m => m.SecondName, new { @class = "form-control", placeholder = "Input SecondName...", required = "required" })
+    @Html.ValidationMessageFor(m => m.SecondName)
+</div>
+
+<div class="mb-3 OrderCity">
+    @Html.LabelFor(m => m.City, new { @class = "form-label" })
+    @Html.TextBoxFor(m => m.City,  new { @class = "form-control", placeholder = "Input City...", required = "required" })
+    @Html.ValidationMessageFor(m => m.City)
+    <label>Select city</label>
+    <select id="CityId" class="form-select" required> 
+    </select>
+</div>
+
+<div class="mb-3 OrderWarehouse">
+    @Html.LabelFor(m => m.WareHouse, new {@class = "form-label"})
+     <select id="WarehouseId" class="form-select" required>
+    </select>
+    @Html.HiddenFor(m => m.WareHouse, new { @id = "SelectedWarehouse" })
+    @Html.ValidationMessageFor(m => m.WareHouse)
+</div>
+
+<div class="mb-3 OrderPhone">
+    @Html.LabelFor(m => m.Phone, new { @class = "form-label" })
+    @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", placeholder = "Input Phone...", required = "required" })
+    @Html.ValidationMessageFor(m => m.Phone)
+</div>
+
+<div class="mb-3 OrderEmail">
+    @Html.LabelFor(m => m.Email, new { @class = "form-label" })
+    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Input Email...", required = "required" })
+    @Html.ValidationMessageFor(m => m.Email)
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<script>
+
+    function updateNovaPoshtaCity(cityName) {
+        fetch(`/order/novaPoshtaCity`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                City: cityName,
+            })
+        })
+            .then(response => response.json())
+            .then(x => {
+                cityDropdown = $('#CityId');
+                cityDropdown.empty();
+                console.log(x.data)
+                //cityDropdown.append(`<option>Select city</option>`)
+                x.data.forEach((city) => {
+                    cityDropdown.append(`<option>${city.description}</option>`);
+                });
+                $('.OrderCity input').val($('#CityId').val());
+                updateWarehouseDropdown($('#CityId').val());
+                $('#CityId').change(function () {
+
+                    const selectedCity = $(this).val();
+
+                    $('.OrderCity input').val(selectedCity);
+                    updateWarehouseDropdown(selectedCity);
+
+                });
+
+            })
+            .catch(error => {
+                console.error('Error fetching cities:', error);
+            });
+    }
+    updateNovaPoshtaCity($(".OrderCity input").val())
+    $(".OrderCity input").change(function () {
+        const cityName = $(this).val();
+        updateNovaPoshtaCity(cityName)
+    });
+
+    function updateWarehouseDropdown(cityName) {
+        fetch(`/order/novaPoshtaWareHouse`, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                City: cityName,
+            })
+        })
+            .then(response => response.json())
+            .then(x => {
+                warehouseDropdown = $('#WarehouseId');
+                warehouseDropdown.empty();
+                console.log(x.data)
+                
+                x.data.forEach(warehouse => {
+                    warehouseDropdown.append(`<option>${warehouse.number}|${warehouse.shortAddress}</option>`);
+                });
+                $('#SelectedWarehouse').val($('#WarehouseId').val())
+                $('#WarehouseId').change(function () {
+                    var selectedWarehouse = $(this).val();
+                    $('#SelectedWarehouse').val(selectedWarehouse);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching warehouses:', error);
+            });
+    }
+</script>

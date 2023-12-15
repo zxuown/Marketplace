@@ -1,0 +1,45 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	var user = ViewData["User"] as User;
+}
+@model Lot
+<div class="mb-3 LotTitle">
+	@Html.LabelFor(m => m.Title, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Title, new {@class = "form-control", placeholder = "Input title..."})
+	@Html.ValidationMessageFor(m => m.Title)
+</div>
+
+<div class="mb-3 LotPrice">
+	@Html.LabelFor(m => m.Price, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Price, new {@class = "form-control", placeholder = "Input Price..."})
+	@Html.ValidationMessageFor(m => m.Price)
+</div>
+
+<div class="mb-3 LotImage">
+	@Html.LabelFor(m => m.Image, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Image, new {@class = "form-control", type="file", accept=".jpg,.png,.jpeg"})
+	@Html.ValidationMessageFor(m => m.Image)
+</div>
+
+<div class="mb-3 form-check">
+	@Html.LabelFor(m => m.Active, new { @class = "form-check-label" })
+	@Html.CheckBoxFor(m => m.Active, new { @class = "form-check-input" })
+	@Html.ValidationMessageFor(m => m.Active)
+</div>
+<div class="mb-3 form-check">
+	@Html.LabelFor(m => m.IsSold, new { @class = "form-check-label" })
+	@Html.CheckBoxFor(m => m.IsSold, new { @class = "form-check-input" })
+	@Html.ValidationMessageFor(m => m.IsSold)
+</div>
+
+<div class="mb-3 LotDate">
+	@Html.LabelFor(m => m.FinalDate, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.FinalDate, "{0:yyyy-MM-dd HH:mm:ss}", new {@class = "form-control", placeholder = "Input date and time...", type = "datetime-local"})
+	@Html.ValidationMessageFor(m => m.FinalDate)
+</div>
+<button type="submit" class="btn btn-success">Save</button>
+<a href="/auction/userLots/@user.Id" class="btn btn-outline-info">Return</a>
+

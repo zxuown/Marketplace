@@ -1,0 +1,26 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+	ViewData["Title"] = "Create item";
+	Layout = "_Layout";
+}
+@model Item
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-md-4">
+			<div class="card">
+				<div class="card-header">
+					<h1 class="card-title">Create item</h1>
+				</div>
+				<div class="card-body">
+					<form method="post" enctype="multipart/form-data">
+						@await Html.PartialAsync("_FormControls", Model)
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+

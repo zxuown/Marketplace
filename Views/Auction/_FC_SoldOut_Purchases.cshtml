@@ -1,0 +1,72 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    var user = ViewData["User"] as User;
+    var temp = ViewData["Title"];
+}
+@model List<Lot>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h1>@temp: @user.UserName</h1>
+            <h2>Balance: @user.Money <a class="btn btn-success mt-5 mb-5" href="/payorder/index"><i class="fas fa-plus"></i></a></h2>
+            <a class="btn btn-outline-primary mt-5 mb-5" href="/auction/userlots/@user.Id">Back</a>
+            <div>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>CreationDate</th>
+                            <th>FinalDate</th>
+                            <th>Image</th>
+                            <th>Price</th>
+                            <th>Creator</th>
+                            <th>UserBuyer</th>
+                            <th>Active</th>
+                            @if (Model.Where(x=>x.User == user).ToList().Count >= 1)
+                            {
+                                <th></th>
+                            }  
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lot in Model)
+                        {
+                            <tr>
+                                <td>@lot.Id</td>
+                                <td>@lot.Title</td>
+                                <td>@lot.CreatedDate</td>
+                                <td>@lot.FinalDate</td>
+                                <td>
+                                    @if (@lot.Image != null)
+                                    {
+                                        <img class="img-thumbnail" src="@lot.Image.Url()" />
+                                    }
+                                </td>
+                                <td>@lot.Price</td>
+                                <td>@lot.User.UserName</td>
+                                <td>@lot.UserBuyer.UserName</td>
+                                <td>@lot.Active</td>
+                                @if (lot.User == user)
+                                {
+                                    <td>
+                                        <div class="d-flex">
+                                            <a class="btn btn-outline-primary" href="/auction/edit/@lot.Id">Edit</a>
+                                            <form method="post" action="delete/@lot.Id">
+                                                <button class="btn btn-outline-warning">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>

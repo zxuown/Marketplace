@@ -1,0 +1,41 @@
+﻿@using Marketplace.Models.LiqPaySDK;
+@using Marketplace.Models;
+@*
+   
+*@
+@{
+	Layout = "_Layout";
+	ViewData["Title"] = "LiqPay";
+}
+<div id="liqpay_checkout"></div>
+
+@section Scripts{
+	<script>
+		console.log("@Html.Raw(ViewData["data"])")
+		console.log("@Html.Raw(ViewData["signature"])")
+		window.LiqPayCheckoutCallback = function () {
+			LiqPayCheckout.init({
+				data: "@Html.Raw(ViewData["data"])",
+				signature: "@Html.Raw(ViewData["signature"])",
+				embedTo: "#liqpay_checkout",
+				language: "ru",
+				mode: "embed" // embed || popup
+			}).on("liqpay.callback", function (data) {
+				console.log(data.status);
+				console.log(data);
+				fetch("/paymentResult", {
+					method: "POST",
+					headers: {
+						'Content-Type': "application/json"
+					},
+					body: JSON.stringify(data)
+				})
+			}).on("liqpay.ready", function (data) {
+				// ready
+			}).on("liqpay.close", function (data) {
+				// close
+			});
+		};
+	</script>
+	<script src="//static.liqpay.ua/libjs/checkout.js" async></script>
+}

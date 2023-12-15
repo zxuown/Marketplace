@@ -1,0 +1,105 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "User lots";
+    Layout = "_Layout";
+    var user = ViewData["User"] as User;
+}
+@model List<Lot>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h1 id="@user.Id" class="current-user-id">Lots @user.UserName</h1>
+            <h2>Balance: @user.Money <a class="btn btn-success mt-5 mb-5" href="/payorder/index"><i class="fas fa-plus"></i></a></h2>
+            <a class="btn btn-outline-primary mt-5 mb-5" href="/item/index">Back</a>
+            <a class="btn btn-success mt-5 mb-5" href="/auction/create">Create lot</a>
+            <a class="btn btn-danger mt-5 mb-5" href="/auction/purchases">Purchases</a>
+            <a class="btn btn-warning mt-5 mb-5" href="/auction/soldout">Sold out</a>
+            <div>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>CreatedDate</th>
+                            <th>Price</th>
+                            <th>FinalDate</th>
+                            <th>Image</th>
+                            <th>UserId</th>
+                            <th>Active</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            if (item.IsSold == false)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Title</td>
+                                    <td>@item.CreatedDate</td>
+                                    <td>@item.Price</td>
+                                    <td>@item.FinalDate</td>
+                                    <td>
+                                        @if (@item.Image != null)
+                                        {
+                                            <img class="img-thumbnail" src="@item.Image.Url()" />
+                                        }
+                                    </td>
+                                    <td>@item.User.Id</td>
+                                    <td>@item.Active</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a class="btn btn-outline-primary" href="/auction/edit/@item.Id">Edit</a>
+                                            <form method="post" action="delete/@item.Id">
+                                                <button class="btn btn-outline-warning">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    let currUserId = $(".current-user-id").attr("id");
+    // let userLotSold = localStorage.getItem('userLotSold');
+    // let messageLotShown = localStorage.getItem('messageLotShown');
+    // console.log(messageLotShown, currUserId, userLotSold)
+    // if (currUserId === userLotSold && messageLotShown === 'false') {
+    //     Swal.fire({
+    //         title: "Good job!",
+    //         text: "You sold your lot. Check your sold-out lot!",
+    //         icon: "success"
+    //     });
+    //     localStorage.setItem('messageLotShown', 'true');
+    // }
+    getSellerSoldItems();
+    function getSellerSoldItems() {
+        fetch(`/auction/soldLots/${currUserId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const soldLotsText = data.map(lot => `'${lot.title}'`).join(', ');
+                    Swal.fire({
+                        title: "Congratulations!",
+                        html: `Your lot(s) ${soldLotsText} have been sold!`,
+                        icon: "success"
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching sold items:', error);
+            });
+    }
+</script>

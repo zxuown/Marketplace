@@ -1,0 +1,103 @@
+﻿@using Marketplace.Models;
+@*
+
+*@
+@{
+    ViewData["Title"] = "Marketplace";
+    Layout = "_Layout";
+    var all = ViewData["AllItems"] as List<Item>;
+    var user = ViewData["CurrentUser"] as User;
+    var categories = ViewData["Categories"] as List<Category>;
+    //var itemsSortedByCategory = ViewData["ItemsSortedByCategory"] as List<Item>;
+}
+@model Category
+<div class="container">
+
+    <h1>Marketplace</h1>
+    <div class="div-container">
+        @if (user == null)
+        {
+            <div id="-1" class="row gap-5 current-user-id"></div>
+        }
+        else
+        {
+            <div id="@user.Id" class="row gap-5 current-user-id"></div>
+        }
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect">Categories</label>
+            </div>
+            <select class="custom-select" id="inputGroupSelect">
+                @foreach (var item in categories)
+                {
+                    <option selected>@item.Title</option>
+                }
+            </select>
+        </div>
+        <div class="row gap-5" id="categoryItemsContainer">
+            @await Html.PartialAsync("_CategoryItems",Model);
+        </div>
+    </div>
+
+
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    //localStorage.clear();
+     let currUserId = $(".current-user-id").attr("id");
+    // let userSold = localStorage.getItem('userSold');
+    // let messageShown = localStorage.getItem('messageShown');
+    // console.log(messageShown, currUserId , userSold)
+    // if (currUserId === userSold && messageShown === 'false') {
+    //     Swal.fire({
+    //         title: "Good job!",
+    //         text: "You sold your items. Check your sold-out items!",
+    //         icon: "success"
+    //     });
+    //     localStorage.setItem('messageShown', 'true');
+    // }
+    function getSellerSoldItems() {
+        fetch(`/item/soldItems/${currUserId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) {
+                    const soldItemsText = data.map(item => `'${item.title}'`).join(', ');
+                    Swal.fire({
+                        title: "Congratulations!",
+                        html: `Your item(s) ${soldItemsText} have been sold!`,
+                        icon: "success"
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching sold items:', error);
+            });
+    }
+
+    getSellerSoldItems();
+
+    $("#inputGroupSelect").change(function () {
+        let categoryTitle = $(this).val();
+        sortByCategory(categoryTitle);
+    });
+
+    function sortByCategory(title) {
+        fetch(`/item/CategorySort/${title}`, {
+            method: "POST",
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                Title: title,
+            })
+        })
+            .then(response => response.text())
+            .then(data => {
+                $("#categoryItemsContainer").html(data);
+            })
+            .catch(error => {
+                console.error('Error fetching sorted category:', error);
+            });
+    }
+</script>

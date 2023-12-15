@@ -1,0 +1,38 @@
+﻿@using Marketplace.Models
+@*
+
+*@
+@{
+	Layout = "_Layout";
+    ViewData["Title"] = "Edit order";
+    var statuses = Enum.GetValues(typeof(Order.OrderStatus)).Cast<Order.OrderStatus>()
+        .Select(x => new SelectListItem
+        {
+            Value = ((int)x).ToString(),
+            Text = x.ToString(),
+        });
+}
+@model Order
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Order</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        @await Html.PartialAsync("_FormControls", Model)
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Status, new {@class = "form-label"})
+                            @Html.DropDownListFor(m => m.Status, statuses, new {@class = "form-control"})
+                            @Html.ValidationMessageFor(m => m.Status)
+                        </div>
+                        <button type="submit" class="btn btn-success">Save</button>
+                        <a href="/order/index" class="btn btn-outline-info">Return</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

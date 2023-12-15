@@ -1,0 +1,72 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Purchases";
+    Layout = "_Layout";
+    var user = ViewData["User"] as User;
+}
+
+@model List<Item>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h1>Purchases @user.UserName</h1>
+            <h2>Balance: @user.Money <a class="btn btn-success mt-5 mb-5" href="/payorder/index"><i class="fas fa-plus"></i></a></h2>
+            <a class="btn btn-outline-primary mt-5 mb-5" href="index">Back</a>
+            <div>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Title</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Category</th>
+                            <th>Active</th>
+                            <th>Image</th>
+                            <th>Images</th>
+                            <th>UserId</th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.Title</td>
+                                    <td>@item.Description</td>
+                                    <td>@item.Price</td>
+                                    <td>@item.Category.Title</td>
+                                    <td>@item.Active</td>
+                                    <td>
+                                        @if (@item.Image != null)
+                                        {
+                                            <img class="img-thumbnail" src="@item.FullUrl" />
+                                        }
+                                    </td>
+                                    <td>
+                                        @foreach (var image in item.Images)
+                                        {
+                                            <img class="img-thumbnail" src="@image.Url()" />
+                                        }
+                                    </td>
+                                    <td>@item.User.Id</td>
+                                    <td>
+                                        <div class="d-flex">
+                                            <a class="btn btn-outline-primary" href="/item/infoAboutItem/@item.Id">Info</a>  
+                                        </div>
+
+                                    </td>
+                                </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>

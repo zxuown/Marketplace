@@ -1,0 +1,57 @@
+﻿@using Marketplace.Models
+@*
+
+*@
+@{
+    var categories = ViewData["Categories"] as List<Category>;
+    var categoriesList = new SelectList(categories, "Id", "Title", Model.Category != null ? Model.Category.Id : categories.First().Id);
+}
+@model Item
+<div class="mb-3">
+	@Html.LabelFor(m => m.Title, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Title, new {@class = "form-control", placeholder = "Input title..."})
+	@Html.ValidationMessageFor(m => m.Title)
+</div>
+<div class="mb-3">
+	@Html.LabelFor(m => m.Description, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Description, new {@class = "form-control", placeholder = "Input description..."})
+	@Html.ValidationMessageFor(m => m.Description)
+</div>
+
+<div class="mb-3">
+	@Html.LabelFor(m => m.Price, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Price, new {@class = "form-control", placeholder = "Input Price..."})
+	@Html.ValidationMessageFor(m => m.Price)
+</div>
+
+<div class="mb-3 form-check">
+	@Html.LabelFor(m => m.Active, new { @class = "form-check-label" })
+	@Html.CheckBoxFor(m => m.Active, new { @class = "form-check-input" })
+	@Html.ValidationMessageFor(m => m.Active)
+</div>
+<div class="mb-3 form-check">
+	@Html.LabelFor(m => m.IsSold, new { @class = "form-check-label" })
+	@Html.CheckBoxFor(m => m.IsSold, new { @class = "form-check-input" })
+	@Html.ValidationMessageFor(m => m.IsSold)
+</div>
+
+<div class="mb-3">
+	@Html.LabelFor(m => m.Image, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Image, new {@class = "form-control", type="file", accept=".jpg,.png,.jpeg"})
+	@Html.ValidationMessageFor(m => m.Image)
+</div>
+
+<div class="mb-3">
+	@Html.LabelFor(m => m.Category, new {@class = "form-label"})
+	@Html.DropDownListFor(m => m.CategoryId, categoriesList, new {@class = "form-control"})
+	@Html.ValidationMessageFor(m => m.CategoryId)
+</div>
+
+<div class="mb-3">
+	@Html.LabelFor(m => m.Images, new {@class = "form-label"})
+	@Html.TextBoxFor(m => m.Images, new {@class = "form-control", type="file", multiple=true, accept=".jpg,.png,.jpeg"})
+	@Html.ValidationMessageFor(m => m.Images)
+</div>
+
+<button type="submit" class="btn btn-success">Save</button>
+<a href="/item/index" class="btn btn-outline-info">Return</a>

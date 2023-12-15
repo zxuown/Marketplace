@@ -1,0 +1,250 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "More info about lot";
+    Layout = "_Layout";
+    var allBidsInLot = ViewData["AllBidsInLot"] as List<Bid>;
+    var highestPrice = ViewData["CurrentHigherPrice"] as string;
+    if (highestPrice == null)
+    {
+        highestPrice = Model.Price.ToString();
+    }
+    var userPriceIsHighest = ViewData["UserPriceIsHighest"] as string;
+    if (userPriceIsHighest == null)
+    {
+        userPriceIsHighest = "false";
+    }
+    var currentUser = ViewData["CurrentUser"] as User;
+    var userIdHighestBid = ViewData["UserIdHighestBid"] as User;
+}
+@model Lot
+<div class="container">
+    <div class="row">
+        <div class="col-md-6" style="width:30%">
+            <p class="text-primary user-balance" id="@currentUser.Money" style="font-size:30px">Your balance: @currentUser.Money</p>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th id="@currentUser.Id" class="current-user-id" scope="col">User-name</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Bid</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bid in allBidsInLot)
+                    {
+                        <tr id="@allBidsInLot.Count()" class="all-bids-in-lot">
+                            <td>@bid.User.UserName</td>
+                            <td>@bid.TimeCreated</td>
+                            <td>@bid.Price</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="@Model.User.Id" class="col-md-6 lot-user-id" style="width:40%">
+            <div class="styleForTimer" style="font-size: 30px; text-align: center" id="demo"></div>
+            <div class="card mx-auto" style="width: 18rem;">
+                @if (Model.Image != null)
+                {
+                    <img src="@Model.Image.Url()" class="card-img-top" alt="Lot Image">
+                }
+                <div id="@currentUser.Id" class="card-body current-user-id">
+                    <h5 id="@Model.Id" class="card-title">@Model.Title</h5>
+                    <p class="card-text">Start price: @Model.Price$</p>
+                    <p class="card-text">Created by: @Model.User.UserName</p>
+                    <p class="card-text">Created: @Model.CreatedDate</p>
+                    <p id="@Model.FinalDate" class="card-text final-date">Ended: @Model.FinalDate</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 d-flex justify-content-center align-items-center" style="width:30%">
+            <div class="text-center">
+                <div class="is-auction-winner"></div>
+                <div class="d-flex justify-content-center">
+                    <p id="@highestPrice" class="text-danger highest-price" style="font-size: 25px">
+                        Current highest price: @highestPrice$
+                    </p>
+                </div>
+                <p class="text-success" style="font-size: 25px">Start price: @Model.Price$</p>
+                @if (userPriceIsHighest == "false")
+                {
+                    <button type="button" id="make-bid-button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#exampleModal">Make bid!</button>
+                }
+                else
+                {
+                    <p class="text-primary your-price-is-highest" style="font-size:50px">Your price is the highest</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@Model.User.UserName's bid</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 lot-price">
+                    <p class="min-money-bet"></p>
+                    <label for="recipient-name" class="col-form-label">The amount of money you want to bet:</label>
+                    <input type="number" class="form-control" id="price-id">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="makeBid('@Model.Title')" id="DoneButton">Done</button>
+            </div>
+        </div>
+    </div>
+</div>
+@if (userIdHighestBid != null)
+{
+    <div id="@userIdHighestBid.Id" class="row gap-5 user-id-highest-bid"></div>
+}
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    var dateTimeString = $(".final-date").attr("id")
+    var [dateString, timeString] = dateTimeString.split(" ")
+    var [day, month, year] = dateString.split(".")
+    var [hour, minute, second] = timeString.split(":")
+
+    var countDownDate = new Date(year, month - 1, day, hour, minute, second).getTime()
+    var intervalDuration = 1000
+
+    let lotId = $(".card-title").attr("id")
+
+    let currentHighestPrice = parseFloat($(".highest-price").attr("id"))
+    // let messageLotShown = localStorage.getItem('messageLotShown')
+    // let userLotSold = localStorage.getItem('userLotSold')
+    function updateCountdown() {
+        var now = new Date().getTime()
+        var distance = countDownDate - now
+        let lotUserId = $(".lot-user-id").attr("id")
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24))
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000)
+        document.getElementById("demo").innerHTML = "Finish time: " + days + "d " + hours + "h " + minutes + "m " + seconds + "s "
+        console.log(lotUserId)
+        if (distance < 0) {
+            clearInterval(x)
+            document.getElementById("demo").innerHTML = "EXPIRED"
+            console.log($("#demo").text())
+            if ($("#demo").text() === "EXPIRED") {
+                if ($(".user-id-highest-bid").attr("id") == $(".current-user-id").attr("id")) {
+                    let winner = document.querySelector('.is-auction-winner')
+                    winner.classList = ("p-3 mb-2 bg-warning text-dark")
+                    winner.style = "font-size:35px; border:5px solid black"
+                    winner.innerHTML = "You are the winner!"
+                }
+                
+                $(".your-price-is-highest").hide()
+                //localStorage.setItem('userLotSold', lotUserId)
+                
+                // if ($(".all-bids-in-lot").attr("id") != undefined) {
+                    fetch(`/auction/isExpired/${lotId}/${currentHighestPrice}`, {
+                        method: "POST"
+                    })
+               // }
+                console.log(currentHighestPrice)
+            }
+            $("#make-bid-button").hide();
+        }
+    }
+
+    updateCountdown()
+
+    var x = setInterval(updateCountdown, intervalDuration)
+
+    
+
+    let userBalance = $(".user-balance").attr("id")
+
+
+    let moreThen5percent = Math.round((currentHighestPrice * (1 + 5 / 100)) * 100) / 100
+
+    let lotPriceDiv = document.querySelector('.min-money-bet')
+
+    let newDiv = document.createElement('div')
+
+    newDiv.textContent = "Min bid: " + moreThen5percent
+
+    newDiv.classList.add('text-primary')
+
+    lotPriceDiv.appendChild(newDiv)
+    
+    let userIdHighestBid = $(".user-id-highest-bid").attr("id")
+    console.log(userIdHighestBid)
+    console.log(currentHighestPrice, userBalance)
+    function makeBid(lotTitle) {
+        if (parseFloat(userBalance) < currentHighestPrice || parseFloat(userBalance) <= $(".lot-price input").val().trim()) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Not enough money!",
+                footer: '<a href="/payorder/index">Refill the balance?</a>'
+            });
+        } 
+        else {
+            if ($(".lot-price input").val().trim() !== "") {
+                if ($(".lot-price input").val().trim() < moreThen5percent) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "The bid price must be 5% higher than the current highest price!",
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Confirm bid?',
+                        text: `Are you sure you want to confirm ${lotTitle} bid?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(`/auction/bidCreate/${lotId}/${userIdHighestBid}`, {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    Price: $(".lot-price input").val().trim(),
+                                })
+                            }).then(response => {
+                                if (response.ok) {
+                                    Swal.fire('Success!', 'Your purchase has been completed.', 'success')
+                                        .then(() => {
+                                            $('#exampleModal').modal('hide');
+                                            // window.location.href = `/auction/infoAboutLot/${lotid}`;
+                                            location.reload()
+                                        });
+                                }
+                            })
+                        }
+                    });
+                }
+
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Fill all fields!",
+                });
+            }
+        }
+       
+
+    }
+</script>

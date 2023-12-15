@@ -1,0 +1,44 @@
+﻿@using Marketplace.Models;
+@*
+
+*@
+@{
+    ViewData["Title"] = "Auction index";
+    Layout = "_Layout";
+    var user = ViewData["CurrentUser"] as User;
+}
+@model List<Lot>
+<div class="container">
+
+    <h1>Auction</h1>
+    <div class="div-container">
+        <div class="row gap-5">
+            @foreach (var lot in Model)
+            {
+                if (lot.Active == true && lot.IsSold == false && lot.FinalDate > DateTime.Now)
+                {
+                    <div class="card" style="width: 18rem;">
+                        @if (lot.Image != null)
+                        {
+                            <img class="card-img-top img-best-style" src="@lot.Image.Url()" alt="Card image cap">
+                        }
+                        <div class="card-body">
+                            <h5 class="card-title">@lot.Title</h5>
+                            <p class="card-text ">Price: @lot.Price$</p>
+                            <p class="card-text ">Created by: @lot.User.UserName</p>
+                            <p class="card-text ">Created: @lot.CreatedDate</p>
+                            <p class="card-text ">Ended: @lot.FinalDate</p>
+                            @if (user.UserName != lot.User.UserName)
+                            {
+                                 <a href="/auction/infoAboutLot/@lot.Id" class="btn btn-outline-info">More...</a>
+                            }
+                            
+                        </div>
+                    </div>
+                }
+
+            }
+        </div>
+
+    </div>
+</div>

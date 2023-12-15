@@ -1,0 +1,36 @@
+﻿@using Marketplace.Models;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+  
+}
+@model Category
+
+@foreach (var item in Model.Items)
+{
+    @if (item.Active == true)
+    {
+        <div class="card" style="width: 18rem;">
+            @if (item.Image != null)
+            {
+                <img class="card-img-top img-best-style" src="@item.FullUrl" alt="Card image cap">
+            }
+            <div class="card-body">
+                <h5 class="card-title">@item.Title</h5>
+                <p id="@item.Id" class="card-text itemSoldId">@item.Description</p>
+                <p class="card-text card-text-success">Category: @item.Category.Title</p>
+                <p id="@item.Price" class="card-text price">Price: @item.Price$</p>
+                <p id="@item.User.Id" class="card-text userId">Created by: @item.User.UserName</p>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    if (User.Identity.Name != item.User.UserName)
+                    {
+                        <a href="/item/InfoAboutItem/@item.Id" class="btn btn-outline-info">More...</a>
+                    }
+                }
+            </div>
+        </div>
+    }
+    
+}
